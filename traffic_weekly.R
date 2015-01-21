@@ -2,7 +2,7 @@
 ############## Traffic Report ###############
 #############################################
 
-setwd("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/Traffic")
+setwd("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic")
 
 library(xlsx)
 library(lubridate)
@@ -171,6 +171,7 @@ report$Other.Referrals.Registration[nrow(report)]<-rep2$goal6Completions[rep2$me
 report$Other.Referrals.Order[nrow(report)]<-rep2$goal1Completions[rep2$medium == "referral"]
 
 report$StartDate[nrow(report)]<-startdate
+rm(rep1,rep2, confirm, enddate, maninput, startdate, today)
 
 write.xlsx(x = report, file = "Traffic Report.xlsx",
                        sheetName = "Traffic Overlook", row.names = FALSE)
