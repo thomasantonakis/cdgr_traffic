@@ -9,12 +9,12 @@ library(lubridate)
 library(zoo)
 library(RGA)
 
-
-if(file.exists("Traffic Report.xlsx")){
-        report<-read.xlsx("Traffic Report.xlsx", sheetIndex=1,
+if (!exists('report')){
+        if (file.exists("Traffic Report.xlsx")) {
+                        report<-read.xlsx("Traffic Report.xlsx", sheetIndex=1,
                            startRow = 1, header=TRUE,stringsAsFactors=FALSE)
-} else {
-        report<-data.frame(Week = 0, 
+        } else {
+                report<-data.frame(Week = 0, 
                            Total.Visit = 0,
                            Total.Regist = 0,
                            Total.Order = 0,
@@ -31,6 +31,7 @@ if(file.exists("Traffic Report.xlsx")){
                            Other.Referrals.Registration = 0,
                            Other.Referrals.Order = 0,
                            StartDate = 0)
+        }
 }
 
 # Authenticate Google Analytics
@@ -41,12 +42,13 @@ ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
 
 
 #Set Dates
+today <- Sys.Date()
+
 # YYYY-MM-DD , today, yesterday, or 7daysAgo
 # Retrieve last Date used, so as to create new limits for report
 if (report$StartDate[1] == 0) {
         print ("Report was just created and is empty!")
         print ("Let's start filling it with data")
-        today <- Sys.Date()
         print ("Today it is :")
         print(format(today, format="%d/%m/%Y"))
         print("We will report data for last week")
@@ -97,6 +99,13 @@ if (report$StartDate[1] == 0) {
         startdate=as.Date(as.numeric(report$StartDate[nrow(report)]))+7
         enddate=startdate+6
 }
+
+
+weeksleft<-as.numeric(today-startdate) %/% 7
+
+
+while (weeksleft!=0) {
+              
 
 # Insert a new line
 report[nrow(report)+1,1]<-week(enddate)
@@ -171,10 +180,18 @@ report$Other.Referrals.Registration[nrow(report)]<-rep2$goal6Completions[rep2$me
 report$Other.Referrals.Order[nrow(report)]<-rep2$goal1Completions[rep2$medium == "referral"]
 
 report$StartDate[nrow(report)]<-startdate
-rm(rep1,rep2, confirm, enddate, maninput, startdate, today)
+
+
+startdate=as.Date(as.numeric(report$StartDate[nrow(report)]))+7
+enddate=startdate+6
+
+weeksleft<-as.numeric(today-startdate) %/% 7
+
+}
+rm(rep1,rep2, enddate)
 
 write.xlsx(x = report, file = "Traffic Report.xlsx",
                        sheetName = "Traffic Overlook", row.names = FALSE)
 
-print("Finished! Please look for an Excel File in the 'C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/Traffic' folder.")
+print("Finished! Please look for an Excel File in the 'C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic' folder.")
 print("Have a nice day!")
