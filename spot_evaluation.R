@@ -6,8 +6,8 @@ client.secret = '9wSw6gyDVXtcgqEe0XazoBWG'
 ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
                     verbose = getOption("rga.verbose"))
 
-startdate='2015-01-26'
-enddate='2015-01-26'
+startdate='2015-01-24'
+enddate='2015-01-25'
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
              
@@ -21,6 +21,7 @@ web<-get_ga(25764841, start.date = startdate, end.date = enddate,
                 ",
              
              dimensions = "
+                        ga:date,
                         ga:hour,
                         ga:minute
                 ",
@@ -45,7 +46,8 @@ android<-get_ga(81060646, start.date = startdate, end.date = enddate,
                         ga:newusers
                 ",
                
-               dimensions = "
+                dimensions = "
+                        ga:date,
                         ga:hour,
                         ga:minute
                 ",
@@ -71,6 +73,7 @@ ios<-get_ga(81074931, start.date = startdate, end.date = enddate,
                 ",
                 
                 dimensions = "
+                        ga:date,
                         ga:hour,
                         ga:minute
                 ",
