@@ -9,7 +9,7 @@ ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
                     verbose = getOption("rga.verbose"))
 
 startdate='2015-01-24'
-enddate='2015-01-27'
+enddate='2015-01-28'
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
              
@@ -84,8 +84,17 @@ ios<-get_ga(81074931, start.date = startdate, end.date = enddate,
 )
 
 library(xlsx)
-actspots<-read.xlsx("SpotAct.xlsx", sheetIndex=3,
-                    startRow = 1, header=TRUE,stringsAsFactors=FALSE)
+# Duplicate sheet
+# fileter Delete sums per day   
+# Column L timestamp
+# Column M ID
+# 5 last columns --> c("dur", "cost", "GRP", "CPR", "Timestamp", "ID")
+actspots<-read.xlsx("SpotAct_2.xlsx", sheetIndex=2,
+                    startRow = 6, header=TRUE,stringsAsFactors=FALSE)
+actspots<-actspots[,(ncol(actspots)-5):ncol(actspots)]
+names(actspots) <- c("dur", "Cost", "GRP", "CPR", "Time", "ID")
+actspots<-actspots[!is.na(actspots$Time),]
+
 
 web$timestamp<-ymd(web$date, tz="GMT")
 hour(web$timestamp)=web$hour
@@ -108,7 +117,7 @@ ios$source <- "ios"
 permin<-rbind(web, android, ios)
 
 
-# Minutes approach
+# Minutes approach sessions
 permin$affected<-0
 proc.time() - ptm
 for (i in 1:nrow(permin)){
@@ -120,9 +129,25 @@ for (i in 1:nrow(permin)){
                 } 
         }
 }
-
-affected<-permin[permin$affected!=0,]
+permin_ses<-permin
+affected_ses<-permin[permin$affected!=0,]
 proc.time() - ptm
+
+# Minutes approach registrations
+permin$affected<-0
+proc.time() - ptm
+for (i in 1:nrow(permin)){
+        for (j in 1:nrow(actspots)){
+                dif<- difftime(permin$timestamp[i], actspots$Time[j], units="mins")
+                if ( (dif>=1.9) & (dif<=10.1)) {
+                        permin$affected[i]<- permin$affected[i]+1
+                        #permin$cost[i]<-permin$cost[i] + actspots$Cost[j]
+                } 
+        }
+}
+
+permin_reg<-permin
+affected_reg<-permin[permin$affected!=0,]
 
 #sessions per 0-3 minutes
 #registrations per 2-10 minutes
@@ -175,15 +200,23 @@ for (i in 1:nrow(actspots)){
 }
 
 # Computations on actspots data-frame
+actspots$cost_per_reg <- actspots$Cost / actspots$registrations
+actspots$cost_per_ses <- actspots$Cost / actspots$sessions
+actspots$reg_per_GRP <- actspots$registrations / actspots$GRP
+actspots$ses_per_GRP <- actspots$sessions / actspots$GRP
+# columns in correct order
+actspots<-actspots[,c(5,6,2,3,4,1,8,7,9,10,11,12)]
+# Export the dataframe
+write.xlsx(x = actspots, file = "Spot_Evaluation.xlsx", row.names = FALSE, )
 
-
+# open and insert two 
 # ga:channelGrouping
 
 
 
 
-write.xlsx(x = affected, file = "affected.xlsx", row.names = FALSE)
-write.xlsx(x = permin, file = "permin.xlsx", row.names = FALSE)
-write.xlsx(x = actspots, file = "actspots.xlsx", row.names = FALSE, )
+# write.xlsx(x = affected, file = "affected.xlsx", row.names = FALSE)
+# write.xlsx(x = permin, file = "permin.xlsx", row.names = FALSE)
+
 gc()
 
