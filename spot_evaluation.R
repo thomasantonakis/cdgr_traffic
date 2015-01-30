@@ -118,6 +118,7 @@ permin<-rbind(web, android, ios)
 
 
 # Minutes approach sessions
+permin$est_ses<- permin$ses
 permin$affected<-0
 proc.time() - ptm
 for (i in 1:nrow(permin)){
@@ -125,7 +126,7 @@ for (i in 1:nrow(permin)){
                 dif<- difftime(permin$timestamp[i], actspots$Time[j], units="mins")
                 if ( (dif>=-0.1) & (dif<=3.1)) {
                         permin$affected[i]<- permin$affected[i]+1
-                        #permin$cost[i]<-permin$cost[i] + actspots$Cost[j]
+                        #permin$est_ses[i]<- 
                 } 
         }
 }
