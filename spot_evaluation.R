@@ -118,37 +118,47 @@ permin<-rbind(web, android, ios)
 
 
 # Minutes approach sessions
-permin$est_ses<- permin$ses
-permin$affected<-0
+permin$incr_ses<- 0
+permin$affected_ses<-0
 proc.time() - ptm
 for (i in 1:nrow(permin)){
         for (j in 1:nrow(actspots)){
                 dif<- difftime(permin$timestamp[i], actspots$Time[j], units="mins")
                 if ( (dif>=-0.1) & (dif<=3.1)) {
-                        permin$affected[i]<- permin$affected[i]+1
-                        #permin$est_ses[i]<- 
+                        permin$affected_ses[i]<- permin$affected_ses[i]+1
+                        temp<-head(permin,i-1)
+                        temp<- tail(temp[temp$affected_ses == 0 & temp$source == permin$source[i-1],],5)
+                        permin$incr_ses[i] <-  permin$sessions[i] - mean(temp$sessions)
                 } 
         }
 }
-permin_ses<-permin
-affected_ses<-permin[permin$affected!=0,]
+#permin_ses<-permin
+# affected_ses<-permin[permin$affected!=0,]
 proc.time() - ptm
 
+
+##### FINDING INDEX ########
+# which( permin$affected %in% 1) multiple encounters INDECES
+# match(1, permin$affected)[1:10] first encounter INDEX
+
 # Minutes approach registrations
-permin$affected<-0
+permin$incr_reg<- 0
+permin$affected_reg<-0
 proc.time() - ptm
 for (i in 1:nrow(permin)){
         for (j in 1:nrow(actspots)){
                 dif<- difftime(permin$timestamp[i], actspots$Time[j], units="mins")
                 if ( (dif>=1.9) & (dif<=10.1)) {
-                        permin$affected[i]<- permin$affected[i]+1
-                        #permin$cost[i]<-permin$cost[i] + actspots$Cost[j]
+                        permin$affected_reg[i]<- permin$affected_reg[i]+1
+                        temp<-head(permin,i-1)
+                        temp<- tail(temp[temp$affected_reg == 0 & temp$source == permin$source[i-1],],5)
+                        permin$incr_reg[i] <-  permin$registrations[i] - mean(temp$registrations)
                 } 
         }
 }
-
-permin_reg<-permin
-affected_reg<-permin[permin$affected!=0,]
+proc.time() - ptm
+# permin_reg<-permin
+# affected_reg<-permin[permin$affected!=0,]
 
 #sessions per 0-3 minutes
 #registrations per 2-10 minutes
@@ -184,14 +194,16 @@ for (i in 1:nrow(actspots)){
                 if (j>1){
                         denomreg<- sum(actspots$GRP[(difftime(now, actspots$Time, units="mins")>=1.9 & difftime(now, actspots$Time, units="mins")<=10.1)])
                 wreg<- actspots$GRP[i] / denomreg
-                meritreg<- wreg * sum(permin$registrations[abs(difftime(now, permin$timestamp, units="mins"))<=0.5])
+                meritreg<- wreg * sum(permin$incr_reg[abs(difftime(now, permin$timestamp, units="mins"))<=0.5])
+                # meritreg<- wreg * sum(permin$registrations[abs(difftime(now, permin$timestamp, units="mins"))<=0.5])
                 actspots$registrations[i] <- actspots$registrations[i] + meritreg
                 }
                 # athroise sessions kai ta registrations twn energwn
                 if (j<=3){
                         denomses<- sum(actspots$GRP[(difftime(now, actspots$Time, units="mins")>=-0.1 & difftime(now, actspots$Time, units="mins")<=3.1)])
                 wses<- actspots$GRP[i] / denomses
-                meritses<- wses * sum(permin$sessions[abs(difftime(now, permin$timestamp, units="mins"))<=0.5])
+                # meritses<- wses * sum(permin$sessions[abs(difftime(now, permin$timestamp, units="mins"))<=0.5])
+                meritses<- wses * sum(permin$incr_ses[abs(difftime(now, permin$timestamp, units="mins"))<=0.5])
                 actspots$sessions[i] <- actspots$sessions[i] + meritses
                 }
                 # grapse sth sthli sessions kai registrations apo panw
