@@ -1,4 +1,5 @@
 ptm <- proc.time()
+# load("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
 library(RGA)
 library(lubridate)
 
@@ -8,8 +9,10 @@ client.secret = '9wSw6gyDVXtcgqEe0XazoBWG'
 ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
                     verbose = getOption("rga.verbose"))
 
-startdate='2015-01-24'
-enddate='2015-01-28'
+############################################
+startdate='2015-01-24' ##Start Date#########
+enddate='2015-01-31' ####End Date###########
+############################################
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
              
@@ -89,7 +92,7 @@ library(xlsx)
 # Column L timestamp
 # Column M ID
 # 5 last columns --> c("dur", "cost", "GRP", "CPR", "Timestamp", "ID")
-actspots<-read.xlsx("SpotAct_2.xlsx", sheetIndex=2,
+actspots<-read.xlsx("SpotAct_3.xlsx", sheetIndex=2,
                     startRow = 6, header=TRUE,stringsAsFactors=FALSE)
 actspots<-actspots[,(ncol(actspots)-5):ncol(actspots)]
 names(actspots) <- c("dur", "Cost", "GRP", "CPR", "Time", "ID")
@@ -128,7 +131,7 @@ for (i in 1:nrow(permin)){
                         permin$affected_ses[i]<- permin$affected_ses[i]+1
                         temp<-head(permin,i-1)
                         temp<- tail(temp[temp$affected_ses == 0 & temp$source == permin$source[i-1],],5)
-                        permin$incr_ses[i] <-  permin$sessions[i] - mean(temp$sessions)
+                        permin$incr_ses[i] <-  max(0,permin$sessions[i] - mean(temp$sessions))
                 } 
         }
 }
@@ -152,12 +155,14 @@ for (i in 1:nrow(permin)){
                         permin$affected_reg[i]<- permin$affected_reg[i]+1
                         temp<-head(permin,i-1)
                         temp<- tail(temp[temp$affected_reg == 0 & temp$source == permin$source[i-1],],5)
-                        permin$incr_reg[i] <-  permin$registrations[i] - mean(temp$registrations)
+                        permin$incr_reg[i] <-  max(0,permin$registrations[i] - mean(temp$registrations))
                 } 
         }
 }
 proc.time() - ptm
-# permin_reg<-permin
+
+
+minute_archive<-rbind(minute_archive,permin)
 # affected_reg<-permin[permin$affected!=0,]
 
 #sessions per 0-3 minutes
@@ -211,7 +216,7 @@ for (i in 1:nrow(actspots)){
                 # an einai ena mono energo grps/ denominator =1 ara olo to lepto
        }
 }
-
+proc.time() - ptm
 # Computations on actspots data-frame
 actspots$cost_per_reg <- actspots$Cost / actspots$registrations
 actspots$cost_per_ses <- actspots$Cost / actspots$sessions
@@ -219,8 +224,12 @@ actspots$reg_per_GRP <- actspots$registrations / actspots$GRP
 actspots$ses_per_GRP <- actspots$sessions / actspots$GRP
 # columns in correct order
 actspots<-actspots[,c(5,6,2,3,4,1,8,7,9,10,11,12)]
+# Save spots archive
+spot_archive<-rbind(spot_archive,actspots)
 # Export the dataframe
-write.xlsx(x = actspots, file = "Spot_Evaluation.xlsx", row.names = FALSE, )
+write.xlsx(x = actspots, file = "Spot_Evaluation2.xlsx", row.names = FALSE, )
+
+save.image("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
 
 # open and insert two 
 # ga:channelGrouping
