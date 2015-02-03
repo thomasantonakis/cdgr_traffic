@@ -1,5 +1,5 @@
 ptm <- proc.time()
-# load("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
+load("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
 library(RGA)
 library(lubridate)
 
@@ -10,8 +10,8 @@ ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
                     verbose = getOption("rga.verbose"))
 
 ############################################
-startdate='2015-01-24' ##Start Date#########
-enddate='2015-01-31' ####End Date###########
+startdate='2015-02-01' ##Start Date#########
+enddate='2015-02-02' ####End Date###########
 ############################################
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
@@ -92,7 +92,7 @@ library(xlsx)
 # Column L timestamp
 # Column M ID
 # 5 last columns --> c("dur", "cost", "GRP", "CPR", "Timestamp", "ID")
-actspots<-read.xlsx("SpotAct_3.xlsx", sheetIndex=2,
+actspots<-read.xlsx("SpotAct_4.xlsx", sheetIndex=2,
                     startRow = 6, header=TRUE,stringsAsFactors=FALSE)
 actspots<-actspots[,(ncol(actspots)-5):ncol(actspots)]
 names(actspots) <- c("dur", "Cost", "GRP", "CPR", "Time", "ID")
@@ -227,7 +227,7 @@ actspots<-actspots[,c(5,6,2,3,4,1,8,7,9,10,11,12)]
 # Save spots archive
 spot_archive<-rbind(spot_archive,actspots)
 # Export the dataframe
-write.xlsx(x = actspots, file = "Spot_Evaluation2.xlsx", row.names = FALSE, )
+write.xlsx(x = actspots, file = "Spot_Evaluation4.xlsx", row.names = FALSE, )
 
 save.image("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
 
