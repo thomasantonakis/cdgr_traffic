@@ -11,8 +11,8 @@ ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
                     verbose = getOption("rga.verbose"))
 
 ############################################
-startdate='2015-02-02' ##Start Date#########
-enddate='2015-02-02' ####End Date###########
+startdate='2015-02-03' ##Start Date#########
+enddate='2015-02-05' ####End Date###########
 ############################################
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
@@ -93,7 +93,7 @@ library(xlsx)
 # Column L timestamp
 # Column M ID
 # 5 last columns --> c("dur", "cost", "GRP", "CPR", "Timestamp", "ID")
-actspots<-read.xlsx("Spot_Act.xlsx", sheetIndex=2,
+actspots<-read.xlsx("Spot_Database.xlsx", sheetIndex=2,
                     startRow = 6, header=TRUE,stringsAsFactors=FALSE)
 actspots<-actspots[,(ncol(actspots)-5):ncol(actspots)]
 names(actspots) <- c("dur", "Cost", "GRP", "CPR", "Time", "ID")
@@ -162,7 +162,7 @@ for (i in 1:nrow(permin)){
 }
 proc.time() - ptm
 
-
+permin$'NA'<-NULL
 minute_archive<-rbind(minute_archive,permin)
 # affected_reg<-permin[permin$affected!=0,]
 
@@ -237,7 +237,7 @@ save.image("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/
 
 
 
-
+# write.xlsx(x = spot_archive, file = "Spot_Evaluation_Archive.xlsx", row.names = FALSE, )
 # write.xlsx(x = affected, file = "affected.xlsx", row.names = FALSE)
 # write.xlsx(x = permin, file = "permin.xlsx", row.names = FALSE)
 
