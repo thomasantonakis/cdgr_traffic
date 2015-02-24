@@ -11,8 +11,8 @@ ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
                     verbose = getOption("rga.verbose"))
 
 ############################################
-startdate='2015-02-03' ##Start Date#########
-enddate='2015-02-05' ####End Date###########
+startdate='2015-02-06' ##Start Date#########
+enddate='2015-02-08' ####End Date###########
 ############################################
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
@@ -228,7 +228,7 @@ actspots<-actspots[,c(5,6,2,3,4,1,8,7,9,10,11,12)]
 # Save spots archive
 spot_archive<-rbind(spot_archive,actspots)
 # Export the dataframe
-write.xlsx(x = actspots, file = "Spot_Evaluation_0202.xlsx", row.names = FALSE, )
+write.xlsx(x = actspots, file = "Spot_Evaluation_0808.xlsx", row.names = FALSE, )
 
 save.image("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
 
