@@ -3,16 +3,16 @@ load("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspot
 setwd("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/TV Spots")
 library(RGA)
 library(lubridate)
+library(dplyr)
 
 client.id = '543269518849-dcdk7eio32jm2i4hf241mpbdepmifj00.apps.googleusercontent.com'
 client.secret = '9wSw6gyDVXtcgqEe0XazoBWG'
 
-ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"),
-                    verbose = getOption("rga.verbose"))
+ga_token<-authorize(client.id, client.secret, cache = getOption("rga.cache"))
 
 ############################################
-startdate='2015-02-06' ##Start Date#########
-enddate='2015-02-08' ####End Date###########
+startdate='2015-03-09' ##Start Date#########
+enddate='2015-03-09' ####End Date###########
 ############################################
 
 web<-get_ga(25764841, start.date = startdate, end.date = enddate,
@@ -35,8 +35,7 @@ web<-get_ga(25764841, start.date = startdate, end.date = enddate,
              sampling.level = NULL,
              start.index = NULL, 
              max.results = NULL, 
-             ga_token,
-             verbose = getOption("rga.verbose")
+             ga_token
 )
 
 android<-get_ga(81060646, start.date = startdate, end.date = enddate,
@@ -59,8 +58,7 @@ android<-get_ga(81060646, start.date = startdate, end.date = enddate,
                sampling.level = NULL,
                start.index = NULL, 
                max.results = NULL, 
-               ga_token,
-               verbose = getOption("rga.verbose")
+               ga_token
 )
 
 ios<-get_ga(81074931, start.date = startdate, end.date = enddate,
@@ -83,8 +81,7 @@ ios<-get_ga(81074931, start.date = startdate, end.date = enddate,
                 sampling.level = NULL,
                 start.index = NULL, 
                 max.results = NULL, 
-                ga_token,
-                verbose = getOption("rga.verbose")
+                ga_token
 )
 
 library(xlsx)
@@ -228,7 +225,7 @@ actspots<-actspots[,c(5,6,2,3,4,1,8,7,9,10,11,12)]
 # Save spots archive
 spot_archive<-rbind(spot_archive,actspots)
 # Export the dataframe
-write.xlsx(x = actspots, file = "Spot_Evaluation_0808.xlsx", row.names = FALSE, )
+write.xlsx(x = actspots, file = "Spot_Evaluation_0903.xlsx", row.names = FALSE, )
 
 save.image("C:/Users/tantonakis/Google Drive/Scripts/AnalyticsProj/cdgr_traffic/tvspots.RData")
 
